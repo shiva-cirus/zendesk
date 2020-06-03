@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -88,6 +88,15 @@ public class BaseZendeskSourceConfig extends ReferencePluginConfig {
   @Nullable
   private String objectsToSkip;
 
+  /**
+   * Constructor for BaseZendeskSourceConfig object.
+   * @param referenceName The reference name
+   * @param adminEmail Zendesk admin email
+   * @param apiToken Zendesk API token
+   * @param subdomains The list of sub-domains
+   * @param objectsToPull The list of objects to pull
+   * @param objectsToSkip The list of objects to skip
+   */
   public BaseZendeskSourceConfig(String referenceName,
                                  String adminEmail,
                                  String apiToken,
@@ -122,6 +131,10 @@ public class BaseZendeskSourceConfig extends ReferencePluginConfig {
     return getList(objectsToSkip);
   }
 
+  /**
+   * Builds a final list of objects to be pulled by reading object to pull and objects to skip lists.
+   * @return the list of objects to pull
+   */
   public List<String> getObjects() {
     Set<String> objectsToPull = getObjectsToPull();
     Set<String> objectsToSkip = getObjectsToSkip();
@@ -132,6 +145,10 @@ public class BaseZendeskSourceConfig extends ReferencePluginConfig {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Validates {@link BaseZendeskSourceConfig} instance.
+   * @param collector The failure collector to collect the errors
+   */
   public void validate(FailureCollector collector) {
     IdUtils.validateReferenceName(referenceName, collector);
     if (!containsMacro(PROPERTY_ADMIN_EMAIL)
@@ -158,6 +175,11 @@ public class BaseZendeskSourceConfig extends ReferencePluginConfig {
       .collect(Collectors.toSet());
   }
 
+  /**
+   * Returns the map of schemas per object.
+   * @param collector The failure collector to collect the errors
+   * @return map of schemas per object
+   */
   public Map<String, Schema> getSchemas(FailureCollector collector) {
     return getObjects().stream()
       .map(object -> ObjectType.fromString(object, collector))

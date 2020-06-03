@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -48,6 +48,12 @@ public class ZendeskRecordReader extends RecordReader<NullWritable, StructuredRe
 
   private Iterator<String> pagedIterator;
 
+  /**
+   * Constructor for ZendeskRecordReader.
+   * @param subdomain the subdomain name
+   * @param objectType the object type for which data to be fetched
+   * @param schema the schema for the object
+   */
   public ZendeskRecordReader(String subdomain, ObjectType objectType, Schema schema) {
     this.subdomain = subdomain;
     this.objectType = objectType;

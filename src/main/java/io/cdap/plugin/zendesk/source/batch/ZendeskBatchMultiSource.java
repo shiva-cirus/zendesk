@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,6 +16,7 @@
 
 package io.cdap.plugin.zendesk.source.batch;
 
+import com.google.common.base.Preconditions;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
@@ -29,9 +30,12 @@ import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.action.SettableArguments;
 import io.cdap.cdap.etl.api.batch.BatchSource;
 import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import io.cdap.plugin.common.LineageRecorder;
 import org.apache.hadoop.io.NullWritable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -72,12 +76,26 @@ public class ZendeskBatchMultiSource extends BatchSource<NullWritable, Structure
         Map.Entry::getKey,
         entry -> entry.getValue().toString()));
 
+    Map<String, String> schemasStringsWithNoObjectField = schemas.entrySet()
+      .stream()
+      .collect(Collectors.toMap(
+        key -> key.getKey(),
+        entry -> {
+          Schema s = entry.getValue();
+          Schema t = Schema.recordOf(s.getRecordName(), s.getFields().stream()
+            .filter(o->!o.getName().equalsIgnoreCase("object")).collect(Collectors.toList()));
+          return t.toString();
+        }));
+
     // propagate schema for each object for multi sink plugin
     SettableArguments arguments = batchSourceContext.getArguments();
-    schemasStrings.forEach(
+    schemasStringsWithNoObjectField.forEach(
       (objectName, objectSchema) -> arguments.set(
         MULTI_SINK_PREFIX + objectName.toLowerCase().replaceAll(" ", "_"),
         objectSchema));
+    schemas.forEach(
+      (objectName, objectSchema) -> recordLineage(batchSourceContext,
+                                                  objectName.toLowerCase().replaceAll(" ", "_"), objectSchema));
 
     batchSourceContext.setInput(Input.of(config.referenceName, new ZendeskInputFormatProvider(
       config, config.getObjects(), schemasStrings)));
@@ -87,5 +105,18 @@ public class ZendeskBatchMultiSource extends BatchSource<NullWritable, Structure
   public void transform(KeyValue<NullWritable, StructuredRecord> input,
                         Emitter<StructuredRecord> emitter) {
     emitter.emit(input.getValue());
+  }
+
+  private void recordLineage(BatchSourceContext context, String objectName, Schema objectSchema) {
+    String outputName = String.format("%s-%s", config.referenceName, objectName);
+    LineageRecorder lineageRecorder = new LineageRecorder(context, outputName);
+    lineageRecorder.createExternalDataset(objectSchema);
+    List<Schema.Field> fields = Objects.requireNonNull(objectSchema).getFields();
+    if (fields != null && !fields.isEmpty()) {
+      lineageRecorder.recordRead("Read", "Read from Zendesk",
+                                 Preconditions.checkNotNull(objectSchema.getFields()).stream()
+                                   .map(Schema.Field::getName)
+                                   .collect(Collectors.toList()));
+    }
   }
 }

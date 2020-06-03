@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -107,6 +107,30 @@ public class ZendeskBatchSourceConfig extends BaseZendeskSourceConfig {
   @Description("Output schema for the source.")
   private String schema;
 
+  @Nullable
+  public String getStartDate() {
+    return startDate;
+  }
+
+  /**
+   * Constructor for ZendeskBatchSourceConfig object.
+   * @param referenceName The reference name
+   * @param adminEmail Zendesk admin email
+   * @param apiToken Zendesk API token
+   * @param subdomains The list of sub-domains
+   * @param objectsToPull The list of objects to pull
+   * @param objectsToSkip The list of objects to skip
+   * @param startDate The start date
+   * @param endDate The end date
+   * @param satisfactionRatingsScore The satisfaction ratings score
+   * @param maxRetryCount The max retry count
+   * @param maxRetryWait The max retry wait time
+   * @param maxRetryJitterWait The max retry jitter wait time
+   * @param connectTimeout The connection timeout
+   * @param readTimeout The read time out
+   * @param zendeskBaseUrl Zendesk base url
+   * @param schema the schema
+   */
   public ZendeskBatchSourceConfig(String referenceName,
                                   String adminEmail,
                                   String apiToken,
@@ -135,11 +159,6 @@ public class ZendeskBatchSourceConfig extends BaseZendeskSourceConfig {
     this.readTimeout = readTimeout;
     this.zendeskBaseUrl = zendeskBaseUrl;
     this.schema = schema;
-  }
-
-  @Nullable
-  public String getStartDate() {
-    return startDate;
   }
 
   @Nullable
@@ -176,6 +195,11 @@ public class ZendeskBatchSourceConfig extends BaseZendeskSourceConfig {
     return zendeskBaseUrl;
   }
 
+  /**
+   * Fetches the schema for the selected single object to pull.
+   * @param collector The failure collector to collect the errors
+   * @return
+   */
   public Schema getSchema(FailureCollector collector) {
     if (Strings.isNullOrEmpty(schema)) {
       String object = getObjectsToPull().iterator().next();

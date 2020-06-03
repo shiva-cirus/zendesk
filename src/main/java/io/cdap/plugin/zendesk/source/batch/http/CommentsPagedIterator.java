@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * Iterable wrapper for Zendesk comments
+ * Iterable wrapper for Zendesk comments.
  */
 public class CommentsPagedIterator implements Iterator<String>, Closeable {
 
@@ -40,6 +40,13 @@ public class CommentsPagedIterator implements Iterator<String>, Closeable {
   private final String subdomain;
   private PagedIterator pagedIterator;
 
+  /**
+   * Constructor for CommentsPagedIterator.
+   * @param entityIterator The instance of PagedIterator object
+   * @param config The batch source config
+   * @param objectType The object type
+   * @param subdomain The sub-domain
+   */
   public CommentsPagedIterator(PagedIterator entityIterator,
                                ZendeskBatchSourceConfig config, ObjectType objectType, String subdomain) {
     this.entityIterator = entityIterator;

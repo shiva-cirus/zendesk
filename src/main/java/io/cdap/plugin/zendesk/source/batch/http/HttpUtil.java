@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -65,6 +65,11 @@ public class HttpUtil {
       {"Bad Without Comment", "bad_without_comment"}})
     .collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
+  /**
+   * Returns CloseableHttpClient object depending on the batch source config
+   * @param config The batch source config
+   * @return The instance of CloseableHttpClient object
+   */
   public static CloseableHttpClient createHttpClient(ZendeskBatchSourceConfig config) {
     HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
     Long connectTimeoutMillis = TimeUnit.SECONDS.toMillis(config.getConnectTimeout());
@@ -77,6 +82,12 @@ public class HttpUtil {
     return httpClientBuilder.build();
   }
 
+  /**
+   * Returns HttpClientContext object depending on the batch source config and url.
+   * @param config The batch source config
+   * @param url The url
+   * @return The instance of HttpClientContext object
+   */
   public static HttpClientContext createHttpContext(ZendeskBatchSourceConfig config, String url) {
     String adminEmail = config.getAdminEmail();
     String apiToken = config.getApiToken();
@@ -99,6 +110,14 @@ public class HttpUtil {
     return context;
   }
 
+  /**
+   * Creates a ulr for the first page.
+   * @param config The batch source config
+   * @param objectType The object type name
+   * @param subdomain The subdomain name
+   * @param entityId The entity id
+   * @return The concatenated url for the first page as per the parameters passed
+   */
   public static String createFirstPageUrl(ZendeskBatchSourceConfig config,
                                           ObjectType objectType, String subdomain,
                                           Long entityId) {
@@ -132,6 +151,11 @@ public class HttpUtil {
     return baseUrl;
   }
 
+  /**
+   * Returns the Retryer object instance depending on the batch source config.
+   * @param config The batch source config
+   * @return The instance of Retryer object
+   */
   public static Retryer<Map<String, Object>> buildRetryer(ZendeskBatchSourceConfig config) {
     return RetryerBuilder.<Map<String, Object>>newBuilder()
       .retryIfExceptionOfType(RateLimitException.class)

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
- * Iterable for Zendesk page response
+ * Iterable for Zendesk page response.
  */
 public class PagedIterator implements Iterator<String>, Closeable {
 
@@ -71,10 +71,23 @@ public class PagedIterator implements Iterator<String>, Closeable {
   private Iterator<String> current;
   private String nextPage;
 
+  /**
+   * Constructor for PagedIterator object.
+   * @param config The batch source config
+   * @param objectType The object type
+   * @param subdomain The subdomain name
+   */
   public PagedIterator(ZendeskBatchSourceConfig config, ObjectType objectType, String subdomain) {
     this(config, objectType, subdomain, null);
   }
 
+  /**
+   * Constructor for PagedIterator object.
+   * @param config The batch source config
+   * @param objectType The object type
+   * @param subdomain The subdomain name
+   * @param entityId The entity id
+   */
   public PagedIterator(ZendeskBatchSourceConfig config, ObjectType objectType,
                        String subdomain, Long entityId) {
     this.config = config;

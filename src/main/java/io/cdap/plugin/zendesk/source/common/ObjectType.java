@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Cask Data, Inc.
+ * Copyright © 2020 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -23,7 +23,7 @@ import io.cdap.plugin.zendesk.source.common.config.BaseZendeskSourceConfig;
 import java.util.Arrays;
 
 /**
- * Supported Zendesk objects with schema
+ * Supported Zendesk objects with schema.
  */
 public enum ObjectType {
   USERS_SIMPLE(
@@ -134,6 +134,11 @@ public enum ObjectType {
     return objectSchema;
   }
 
+  /**
+   * Converts object type string value into {@link ObjectType} enum.
+   * @param value object type string value
+   * @return {@link ObjectType} enum
+   */
   public static ObjectType fromString(String value) {
     return Arrays.stream(ObjectType.values())
       .filter(fields -> fields.getObjectName().equals(value))
@@ -141,6 +146,12 @@ public enum ObjectType {
       .orElseThrow(() -> new IllegalStateException(String.format("'%s' is invalid %s", value, CLASS_NAME)));
   }
 
+  /**
+   * Converts object type string value into {@link ObjectType} enum.
+   * @param value object type string value
+   * @param collector the failure collector to collect the errors
+   * @return {@link ObjectType} enum
+   */
   public static ObjectType fromString(String value, FailureCollector collector) {
     return Arrays.stream(ObjectType.values())
       .filter(objectType -> objectType.getObjectName().equals(value))
